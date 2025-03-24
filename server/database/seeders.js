@@ -1,22 +1,25 @@
 import db from "./database.js";
+import Application from "../models/Application.js";
 import User from "../models/User.js";
 import Document from "../models/Document.js";
-import Application from "../models/Application.js";
 
-const migrate = async () => {
+const seed = async () => {
   try {
-    await db.sync({ force: true });
-    console.log("✅ Database berhasil dimigrasi");
+    // Pastikan koneksi ke database
+    await db.authenticate();
 
-    // Seeder data awal
+    console.log("✅ Koneksi ke database berhasil, mulai seeding...");
+
+    // Seeder data aplikasi
     await Application.bulkCreate([
-      { url: "http://example.com/a", name: "Aplikasi A" },
-      { url: "http://example.com/b", name: "Aplikasi B" },
-      { url: "http://example.com/c", name: "Aplikasi C" },
-      { url: "http://example.com/d", name: "Aplikasi D" },
-      { url: "http://example.com/e", name: "Aplikasi E" },
+      { url: "http://example.com/a", name: "Aplikasi A", apiKey: "apikeyA" },
+      { url: "http://example.com/b", name: "Aplikasi B", apiKey: "apikeyB" },
+      { url: "http://example.com/c", name: "Aplikasi C", apiKey: "apikeyC" },
+      { url: "http://example.com/d", name: "Aplikasi D", apiKey: "apikeyD" },
+      { url: "http://example.com/e", name: "Aplikasi E", apiKey: "apikeyE" },
     ]);
 
+    // Seeder data user
     await User.bulkCreate([
       { nip: "123456789012345678", name: "User A" },
       { nip: "876543210987654321", name: "User B" },
@@ -30,6 +33,7 @@ const migrate = async () => {
       { nip: "987987987987987987", name: "User J" },
     ]);
 
+    // Seeder data dokumen
     await Document.bulkCreate([
       { userId: 1, applicationId: 1, filename: "file1.pdf" },
       { userId: 1, applicationId: 2, filename: "file2.pdf" },
@@ -45,10 +49,10 @@ const migrate = async () => {
 
     console.log("✅ Seeder berhasil dijalankan");
   } catch (error) {
-    console.error("❌ Migrasi gagal:", error);
+    console.error("❌ Seeder gagal:", error);
   } finally {
     process.exit();
   }
 };
 
-migrate();
+seed();

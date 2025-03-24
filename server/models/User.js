@@ -5,10 +5,12 @@ const User = db.define(
   "User",
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    nip: { type: DataTypes.STRING, allowNull: false, unique: true },
+    nip: { type: DataTypes.STRING, unique: true, allowNull: false },
     name: { type: DataTypes.STRING, allowNull: false },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 export default User;
