@@ -26,7 +26,12 @@ export default defineEventHandler(async (event) => {
     });
 
   // Cari document berdasarkan documentId
-  const document = await Document.findByPk(documentId);
+  const document = await Document.findByPk(documentId, {
+    include: [
+      { model: User, attributes: ["name"] },
+      { model: Application, attributes: ["name"] },
+    ],
+  });
   if (!document)
     throw createError({ statusCode: 404, message: "Dokumen tidak ditemukan" });
 
@@ -43,5 +48,14 @@ export default defineEventHandler(async (event) => {
   document.status = "signed";
   await document.save();
 
-  return { message: "Dokumen yang ditandatangani berhasil disimpan", document };
+  return {
+    message: "Dokumen yang ditandatangani berhasil disimpan",
+    data: {
+      fileUrl: `/uploads/signed/${document.filename}`,
+      applicationName: document.Application.name,
+      userName: document.User.name,
+      filename: document.filename,
+      status: document.status,
+    },
+  };
 });

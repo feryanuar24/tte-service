@@ -3,6 +3,7 @@ import path from "path";
 import { defineEventHandler, readMultipartFormData } from "h3";
 import User from "../../models/User.js";
 import Document from "../../models/Document.js";
+import Application from "../../models/Application.js";
 import apiKeyAuth from "../middleware/apiKeyAuth.js";
 
 export default defineEventHandler(async (event) => {
@@ -48,5 +49,21 @@ export default defineEventHandler(async (event) => {
     filename: file.filename,
   });
 
-  return { message: "File berhasil diunggah", document };
+  // Ambil data lengkap document dengan join ke User dan Application
+  const fullDocument = await Document.findByPk(document.id, {
+    include: [
+      { model: User, attributes: ["name"] },
+      { model: Application, attributes: ["name"] },
+    ],
+  });
+
+  return {
+    message: "File berhasil diunggah",
+    data: {
+      applicationName: fullDocument.Application.name,
+      userName: fullDocument.User.name,
+      filename: fullDocument.filename,
+      statusDocument: fullDocument.status,
+    },
+  };
 });

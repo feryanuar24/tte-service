@@ -12,7 +12,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "ID dokumen diperlukan" });
 
   // Cari document berdasarkan documentId
-  const document = await Document.findByPk(documentId);
+  const document = await Document.findByPk(documentId, {
+    include: [
+      { model: User, attributes: ["name"] },
+      { model: Application, attributes: ["name"] },
+    ],
+  });
   if (!document)
     throw createError({
       statusCode: 404,
@@ -21,6 +26,12 @@ export default defineEventHandler(async (event) => {
 
   return {
     message: "Dokumen yang ditandatangani berhasil diambil",
-    file: `/uploads/signed/${document.filename}`,
+    data: {
+      fileUrl: `/uploads/signed/${document.filename}`,
+      applicationName: document.Application.name,
+      userName: document.User.name,
+      filename: document.filename,
+      status: document.status,
+    },
   };
 });

@@ -10,15 +10,23 @@ export default defineEventHandler(async (event) => {
   const { documentId } = await readBody(event);
 
   // Cari document berdasarkan documentId
-  const document = await Document.findByPk(documentId);
+  const document = await Document.findByPk(documentId, {
+    include: [
+      { model: User, attributes: ["name"] },
+      { model: Application, attributes: ["name"] },
+    ],
+  });
   if (!document)
     throw createError({ statusCode: 404, message: "Dokumen tidak ditemukan" });
 
-  // Tambahkan properti fileUrl ke objek document
-  const fileUrl = `/uploads/${document.filename}`;
-
   return {
     message: "Dokumen dikirim ke TTE",
-    document: { ...document.toJSON(), fileUrl },
+    data: {
+      fileUrl: `/uploads/${document.filename}`,
+      applicationName: document.Application.name,
+      userName: document.User.name,
+      filename: document.filename,
+      status: document.status,
+    },
   };
 });

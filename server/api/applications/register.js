@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   if (existingApp)
     return {
       message: "Aplikasi sudah terdaftar",
-      apiKey: existingApp.apiKey,
+      data: existingApp,
     };
 
   // Buat aplikasi baru
@@ -31,6 +31,10 @@ export default defineEventHandler(async (event) => {
 
   return {
     message: "Aplikasi berhasil didaftarkan",
-    apiKey: newApp.apiKey,
+    data: {
+      apiKey: newApp.apiKey,
+      url: newApp.url,
+      name: newApp.name,
+    },
   };
 });
